@@ -119,10 +119,10 @@ renderTable books = H.table H.! A.class_ "table" $ do
         H.tr $ do
           H.td $ H.toHtml title
           H.td $ H.toHtml pages
-          H.td $ H.a "edit" H.! A.class_ "btn btn-light" H.! A.href (stringValue ("/" ++ encode title))
+          H.td $ H.a "edit" H.! A.class_ "btn btn-light btn-sm" H.! A.href (stringValue ("/" ++ encode title))
           H.td $ do
             H.form H.! A.method "POST" H.! A.action (stringValue ("/delete/" ++ encode title)) $ do
-              H.button "Delete" H.! A.type_ "submit" H.! A.class_ "btn btn-danger"
+              H.button "Delete" H.! A.type_ "submit" H.! A.class_ "btn btn-danger btn-sm"
     )
     books
 

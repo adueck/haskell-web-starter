@@ -4,6 +4,8 @@ A simple template for getting started on Haskell web development. This provides 
 
 This can be used to get started with JSON API webservices, client-facing HTML web apps, or both.
 
+https://github.com/adueck/haskell-web-starter/assets/12955501/34a2fb51-9a1a-48f9-b80a-fea1819fa61c
+
 ## Features
 
 - http routing with [scotty](https://hackage.haskell.org/package/scotty)

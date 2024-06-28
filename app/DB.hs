@@ -10,6 +10,7 @@ module DB
   )
 where
 
+import Control.Monad
 import Database.PostgreSQL.Simple
 import Types
 
@@ -76,9 +77,13 @@ updateBook conn oldTitle updatedBook = do
 
 setupDB :: Connection -> IO ()
 setupDB conn = do
-  _ <-
-    execute
-      conn
-      "CREATE TABLE IF NOT EXISTS library ( title VARCHAR (100), pages INT ); INSERT INTO library VALUES ('Learn you a Haskell', 25), ('Haskell Design Patterns', 50)"
-      ()
-  return ()
+  putStrLn "ok here we go!!"
+  a :: [(String, String)] <- query conn "SELECT schemaname, tablename FROM pg_tables WHERE tablename = ?" (Only "library" :: Only String)
+  when (null a) $ do
+    putStrLn "Creating library table..."
+    _ <-
+      execute
+        conn
+        "CREATE TABLE IF NOT EXISTS library ( title VARCHAR (100), pages INT ); INSERT INTO library VALUES ('Learn you a Haskell', 25), ('Haskell Design Patterns', 50)"
+        ()
+    return ()

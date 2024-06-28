@@ -4,8 +4,6 @@ A simple template for getting started on Haskell web development. This provides 
 
 This can be used to get started with JSON API webservices, client-facing HTML web apps, or both.
 
-https://github.com/adueck/haskell-web-starter/assets/12955501/34a2fb51-9a1a-48f9-b80a-fea1819fa61c
-
 ## Features
 
 - http routing with [scotty](https://hackage.haskell.org/package/scotty)
@@ -16,6 +14,8 @@ https://github.com/adueck/haskell-web-starter/assets/12955501/34a2fb51-9a1a-48f9
 - Postgres database connection using [postgresql-simple](https://hackage.haskell.org/package/postgresql-simple)
 - App building and serving with [Cabal](https://hackage.haskell.org/package/Cabal)
 - VSCode integration/intellisense with the [Haskell Extension](https://marketplace.visualstudio.com/items?itemName=haskell.haskell)
+
+https://github.com/adueck/haskell-web-starter/assets/12955501/34a2fb51-9a1a-48f9-b80a-fea1819fa61c
 
 ## Requires
 

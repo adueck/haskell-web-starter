@@ -27,6 +27,18 @@ indexBooks conn msg = do
   books <- liftIO $ DB.getBooks conn
   indexPage msg books
 
+createBook :: Connection -> ActionM ()
+createBook conn = do
+  ps <- formParams
+  let book = bookFromParams ps
+  case book of
+    Nothing -> indexBooks conn "invalid submission"
+    Just b -> do
+      res <- liftIO $ DB.addBook conn b
+      case res of
+        Left err -> indexBooks conn err
+        Right _ -> indexBooks conn ""
+
 showBook :: Connection -> ActionM ()
 showBook conn = do
   title :: String <- pathParam "book"
@@ -55,18 +67,6 @@ destroyBook conn = do
   title <- pathParam "book"
   _ <- liftIO $ DB.removeBook conn title
   redirect "/"
-
-createBook :: Connection -> ActionM ()
-createBook conn = do
-  ps <- formParams
-  let book = bookFromParams ps
-  case book of
-    Nothing -> indexBooks conn "invalid submission"
-    Just b -> do
-      res <- liftIO $ DB.addBook conn b
-      case res of
-        Left err -> indexBooks conn err
-        Right _ -> indexBooks conn ""
 
 -- Views
 

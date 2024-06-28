@@ -41,5 +41,5 @@ routes conn = scotty 8080 $ do
   --  (REST API)
   get "/api/books" (Api.getBooks conn)
   post "/api/books" (Api.addBook conn)
-  -- put "/api/books" (Api.updateBook conn)
+  put "/api/books" (Api.updateBook conn)
   delete "/api/:book" (Api.removeBook conn)

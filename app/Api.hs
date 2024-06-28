@@ -4,6 +4,7 @@ module Api
   ( getBooks,
     addBook,
     removeBook,
+    updateBook,
   )
 where
 
@@ -15,15 +16,23 @@ import Network.HTTP.Types.Status
 import Types
 import Web.Scotty
 
--- updateBook :: Connection -> ActionM ()
--- updateBook conn = do
---   (Book title pages) <- jsonData
---   books <- queryBooks conn title
---   if null books
---     then json $ object ["error" .= ("Book not found!" :: String)]
---     else do
---       _ <- liftIO $ execute conn "UPDATE library SET pages = ? WHERE title = ?" (pages, title)
---       json $ object ["message" .= ("Updated book" :: String)]
+updateBook :: Connection -> ActionM ()
+updateBook conn = do
+  (BookUpdate oldTitle b) :: BookUpdate <- jsonData
+  res <- liftIO $ DB.updateBook conn oldTitle b
+  case res of
+    Left err -> do
+      status status400
+      json $ object ["error" .= err]
+    Right _ -> do
+      json $ object ["message" .= ("Book updated" :: String)]
+
+-- books <- queryBooks conn title
+-- if null books
+--   then json $ object ["error" .= ("Book not found!" :: String)]
+--   else do
+--     _ <- liftIO $ execute conn "UPDATE library SET pages = ? WHERE title = ?" (pages, title)
+--     json $ object ["message" .= ("Updated book" :: String)]
 
 -- getPages :: () -> ActionM (Maybe Int)
 -- getPages _ = do

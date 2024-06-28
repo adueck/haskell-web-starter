@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Types (Book (..)) where
+module Types (Book (..), BookUpdate (..)) where
 
 import Data.Aeson
   ( FromJSON (parseJSON),
@@ -10,6 +10,12 @@ import Data.Aeson
     object,
     (.:),
   )
+
+data BookUpdate = BookUpdate
+  { oldTitle :: String,
+    updatedBook :: Book
+  }
+  deriving (Show, Eq)
 
 data Book = Book
   { title :: String,
@@ -30,3 +36,10 @@ instance ToJSON Book where
       [ "title" .= title,
         "pages" .= pages
       ]
+
+instance FromJSON BookUpdate where
+  parseJSON (Object o) =
+    BookUpdate
+      <$> o .: "oldTitle"
+      <*> o .: "updatedBook"
+  parseJSON _ = fail "Expected an object for Product"

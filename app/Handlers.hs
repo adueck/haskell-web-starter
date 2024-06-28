@@ -34,22 +34,6 @@ home conn msg = do
         renderForm "" 0 "/" "Add Book"
         H.p $ H.toHtml msg
 
-renderForm :: String -> Int -> String -> String -> H.Html
-renderForm titleVal pagesVal actionPath buttonText =
-  H.form H.! A.class_ "row g-3" H.! A.method "post" H.! A.action (stringValue actionPath) $ do
-    H.div H.! A.class_ "col-md-6" $ do
-      H.label "Title:" H.! A.for "title"
-      H.input H.! A.class_ "form-control" H.! A.type_ "text" H.! A.name "title" H.! A.value (stringValue titleVal)
-    H.div H.! A.class_ "col-md-6" $ do
-      H.label "Pages read:" H.! A.for "pages"
-      H.input
-        H.! A.class_ "form-control"
-        H.! A.type_ "number"
-        H.! A.name "pages"
-        H.! A.value (if pagesVal > 0 then stringValue $ show pagesVal else "")
-    H.div H.! A.class_ "col-12" $ do
-      H.button (H.toHtml buttonText) H.! A.type_ "submit" H.! A.class_ "btn btn-primary"
-
 showEditBook :: Connection -> ActionM ()
 showEditBook conn = do
   title :: String <- pathParam "book"
@@ -94,20 +78,7 @@ receiveAddBookForm conn = do
         Left err -> home conn err
         Right _ -> home conn ""
 
-bookFromParams :: [Param] -> Maybe Book
-bookFromParams p = do
-  title <- lookup "title" p
-  let titleStr = unpack title
-  pagesRaw <- lookup "pages" p
-  pages :: Int <- readMaybe $ unpack pagesRaw
-  if null titleStr
-    then Nothing
-    else
-      Just
-        Book
-          { title = titleStr,
-            pages = pages
-          }
+-- HTML Components
 
 pageBase :: String -> H.Html -> H.Html
 pageBase title children =
@@ -119,6 +90,22 @@ pageBase title children =
       H.div H.! A.class_ "container py-4" $ do
         H.h1 (H.toHtml title) H.! A.class_ "mb-4"
         children
+
+renderForm :: String -> Int -> String -> String -> H.Html
+renderForm titleVal pagesVal actionPath buttonText =
+  H.form H.! A.class_ "row g-3" H.! A.method "post" H.! A.action (stringValue actionPath) $ do
+    H.div H.! A.class_ "col-md-6" $ do
+      H.label "Title:" H.! A.for "title"
+      H.input H.! A.class_ "form-control" H.! A.type_ "text" H.! A.name "title" H.! A.value (stringValue titleVal)
+    H.div H.! A.class_ "col-md-6" $ do
+      H.label "Pages read:" H.! A.for "pages"
+      H.input
+        H.! A.class_ "form-control"
+        H.! A.type_ "number"
+        H.! A.name "pages"
+        H.! A.value (if pagesVal > 0 then stringValue $ show pagesVal else "")
+    H.div H.! A.class_ "col-12" $ do
+      H.button (H.toHtml buttonText) H.! A.type_ "submit" H.! A.class_ "btn btn-primary"
 
 renderTable :: [Book] -> H.Html
 renderTable books = H.table H.! A.class_ "table" $ do
@@ -138,3 +125,20 @@ renderTable books = H.table H.! A.class_ "table" $ do
               H.button "Delete" H.! A.type_ "submit" H.! A.class_ "btn btn-danger"
     )
     books
+
+-- Helper Functions
+
+bookFromParams :: [Param] -> Maybe Book
+bookFromParams p = do
+  title <- lookup "title" p
+  let titleStr = unpack title
+  pagesRaw <- lookup "pages" p
+  pages :: Int <- readMaybe $ unpack pagesRaw
+  if null titleStr
+    then Nothing
+    else
+      Just
+        Book
+          { title = titleStr,
+            pages = pages
+          }

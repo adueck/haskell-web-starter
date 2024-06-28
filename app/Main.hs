@@ -32,11 +32,11 @@ routes conn = scotty 8080 $ do
   middleware $ staticPolicy (noDots >-> addBase "static")
   -- Client-facing HTTP Handlers
   --  (web app)
-  get "/" (H.home conn "")
-  post "/" (H.receiveAddBookForm conn)
-  post "/:book" (H.receiveEditBookForm conn)
-  get "/:book" (H.showEditBook conn)
-  post "/delete/:book" (H.receiveDeleteReq conn)
+  get "/" (H.indexBooks conn "")
+  post "/" (H.createBook conn)
+  post "/:book" (H.updateBook conn)
+  get "/:book" (H.showBook conn)
+  post "/delete/:book" (H.destroyBook conn)
   -- JSON Api routs
   --  (REST API)
   get "/api/books" (Api.getBooks conn)

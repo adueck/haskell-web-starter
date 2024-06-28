@@ -77,7 +77,6 @@ updateBook conn oldTitle updatedBook = do
 
 setupDB :: Connection -> IO ()
 setupDB conn = do
-  putStrLn "ok here we go!!"
   a :: [(String, String)] <- query conn "SELECT schemaname, tablename FROM pg_tables WHERE tablename = ?" (Only "library" :: Only String)
   when (null a) $ do
     putStrLn "Creating library table..."

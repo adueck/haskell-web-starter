@@ -1,12 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Handlers
-  ( home,
-    showEditBook,
-    receiveEditBookForm,
-    receiveDeleteReq,
-    receiveAddBookForm,
-    renderTable,
+  ( indexBooks,
+    showBook,
+    updateBook,
+    destroyBook,
+    createBook,
   )
 where
 
@@ -23,32 +22,23 @@ import Text.Read
 import Types
 import Web.Scotty
 
-home :: Connection -> String -> ActionM ()
-home conn msg = do
+indexBooks :: Connection -> String -> ActionM ()
+indexBooks conn msg = do
   books <- liftIO $ DB.getBooks conn
-  html $
-    renderHtml $
-      pageBase "My Library" $ do
-        renderTable books
-        H.h4 "Add book"
-        renderForm "" 0 "/" "Add Book"
-        H.p $ H.toHtml msg
+  indexPage msg books
 
-showEditBook :: Connection -> ActionM ()
-showEditBook conn = do
+showBook :: Connection -> ActionM ()
+showBook conn = do
   title :: String <- pathParam "book"
   book <- liftIO $ DB.queryBook conn title
   case book of
     Nothing -> do
       redirect "/"
-    Just (Book t p) -> do
-      html $
-        renderHtml $
-          pageBase "My Library / Edit Book" $ do
-            renderForm t p ("/" ++ encode title) "Edit Book"
+    Just b -> do
+      bookPage b
 
-receiveEditBookForm :: Connection -> ActionM ()
-receiveEditBookForm conn = do
+updateBook :: Connection -> ActionM ()
+updateBook conn = do
   ps <- formParams
   oldTitle <- pathParam "book"
   let book = bookFromParams ps
@@ -60,28 +50,45 @@ receiveEditBookForm conn = do
         Left _ -> redirect "/"
         Right _ -> redirect "/"
 
-receiveDeleteReq :: Connection -> ActionM ()
-receiveDeleteReq conn = do
+destroyBook :: Connection -> ActionM ()
+destroyBook conn = do
   title <- pathParam "book"
   _ <- liftIO $ DB.removeBook conn title
   redirect "/"
 
-receiveAddBookForm :: Connection -> ActionM ()
-receiveAddBookForm conn = do
+createBook :: Connection -> ActionM ()
+createBook conn = do
   ps <- formParams
   let book = bookFromParams ps
   case book of
-    Nothing -> home conn "invalid submission"
+    Nothing -> indexBooks conn "invalid submission"
     Just b -> do
       res <- liftIO $ DB.addBook conn b
       case res of
-        Left err -> home conn err
-        Right _ -> home conn ""
+        Left err -> indexBooks conn err
+        Right _ -> indexBooks conn ""
+
+-- Views
+
+indexPage :: String -> [Book] -> ActionM ()
+indexPage msg books = html $
+  renderHtml $
+    template "My Library" $ do
+      booksTable books
+      H.h4 "Add book"
+      bookForm "" 0 "/" "Add Book"
+      H.p $ H.toHtml msg
+
+bookPage :: Book -> ActionM ()
+bookPage book = html $
+  renderHtml $
+    template "My Library / Edit Book" $ do
+      bookForm (title book) (pages book) ("/" ++ encode (title book)) "Edit Book"
 
 -- HTML Components
 
-pageBase :: String -> H.Html -> H.Html
-pageBase title children =
+template :: String -> H.Html -> H.Html
+template title children =
   H.html $ do
     H.head $ do
       H.title (H.toHtml title)
@@ -91,8 +98,8 @@ pageBase title children =
         H.h1 (H.toHtml title) H.! A.class_ "mb-4"
         children
 
-renderForm :: String -> Int -> String -> String -> H.Html
-renderForm titleVal pagesVal actionPath buttonText =
+bookForm :: String -> Int -> String -> String -> H.Html
+bookForm titleVal pagesVal actionPath buttonText =
   H.form H.! A.class_ "row g-3" H.! A.method "post" H.! A.action (stringValue actionPath) $ do
     H.div H.! A.class_ "col-md-6" $ do
       H.label "Title:" H.! A.for "title"
@@ -107,8 +114,8 @@ renderForm titleVal pagesVal actionPath buttonText =
     H.div H.! A.class_ "col-12" $ do
       H.button (H.toHtml buttonText) H.! A.type_ "submit" H.! A.class_ "btn btn-primary"
 
-renderTable :: [Book] -> H.Html
-renderTable books = H.table H.! A.class_ "table" $ do
+booksTable :: [Book] -> H.Html
+booksTable books = H.table H.! A.class_ "table" $ do
   H.tr $ do
     H.th "Title" H.! A.scope "col"
     H.th "Pages Read" H.! A.scope "col"

@@ -37,7 +37,7 @@ routes conn = scotty 8080 $ do
   post "/:book" (H.updateBook conn)
   get "/:book" (H.showBook conn)
   post "/delete/:book" (H.destroyBook conn)
-  -- JSON Api routs
+  -- JSON Api routes
   --  (REST API)
   get "/api/books" (Api.getBooks conn)
   post "/api/books" (Api.addBook conn)

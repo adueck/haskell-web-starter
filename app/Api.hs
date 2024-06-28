@@ -34,29 +34,22 @@ getBooks conn = do
 
 addBook :: Connection -> ActionM ()
 addBook conn = do
-  (Book title pages) <- jsonData
-  res <- liftIO $ DB.queryBook conn title
-  if not (null res)
-    then do
-      status status409
-      json $ object ["error" .= ("Book already exists" :: String)]
-    else do
-      _ <- liftIO $ execute conn "INSERT INTO library VALUES (?, ?)" (title, pages)
+  book <- jsonData
+  res <- liftIO $ DB.addBook conn book
+  case res of
+    Left err -> do
+      status status400
+      json $ object ["error" .= err]
+    Right _ -> do
       json $ object ["message" .= ("Book added" :: String)]
 
 removeBook :: Connection -> ActionM ()
 removeBook conn = do
-  title <- pathParam "title"
-  res <- liftIO $ DB.queryBook conn title
-  if null res
-    then do
+  title <- pathParam "book"
+  res <- liftIO $ DB.removeBook conn title
+  case res of
+    Left err -> do
       status status404
-      json $ object ["error" .= ("Book not found for removal" :: String)]
-    else do
-      _ <-
-        liftIO $
-          execute
-            conn
-            "DELETE FROM library WHERE title = ? "
-            (Only title :: Only String)
+      json $ object ["error" .= err]
+    Right _ -> do
       json $ object ["message" .= ("Book removed" :: String)]

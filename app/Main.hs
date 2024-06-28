@@ -42,4 +42,4 @@ routes conn = scotty 8080 $ do
   get "/api/books" (Api.getBooks conn)
   post "/api/books" (Api.addBook conn)
   put "/api/books" (Api.updateBook conn)
-  delete "/api/:book" (Api.removeBook conn)
+  delete "/api/books/:book" (Api.removeBook conn)

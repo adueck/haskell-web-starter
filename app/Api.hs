@@ -27,19 +27,6 @@ updateBook conn = do
     Right _ -> do
       json $ object ["message" .= ("Book updated" :: String)]
 
--- books <- queryBooks conn title
--- if null books
---   then json $ object ["error" .= ("Book not found!" :: String)]
---   else do
---     _ <- liftIO $ execute conn "UPDATE library SET pages = ? WHERE title = ?" (pages, title)
---     json $ object ["message" .= ("Updated book" :: String)]
-
--- getPages :: () -> ActionM (Maybe Int)
--- getPages _ = do
---   pagesRaw <- pathParam "pages"
---   let p = readMaybe pagesRaw :: Maybe Int
---   return p
-
 getBooks :: Connection -> ActionM ()
 getBooks conn = do
   books <- liftIO $ DB.getBooks conn

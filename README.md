@@ -22,7 +22,7 @@ This can be used to get started with JSON API webservices, client-facing HTML we
 
 ## Running
 
-Edit the Postgres connection info in `Main.hs`
+Edit the Postgres connection info in `app/Main.hs`
 
 ```hs
 localPG :: ConnectInfo

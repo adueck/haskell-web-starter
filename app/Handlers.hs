@@ -29,8 +29,7 @@ indexBooks conn msg = do
 
 createBook :: Connection -> ActionM ()
 createBook conn = do
-  ps <- formParams
-  let book = bookFromParams ps
+  book <- bookFromParams <$> formParams
   case book of
     Nothing -> indexBooks conn "invalid submission"
     Just b -> do
@@ -137,15 +136,14 @@ booksTable books = H.table H.! A.class_ "table" $ do
 
 bookFromParams :: [Param] -> Maybe Book
 bookFromParams p = do
-  title <- lookup "title" p
-  let titleStr = unpack title
+  title <- unpack <$> lookup "title" p
   pagesRaw <- lookup "pages" p
   pages :: Int <- readMaybe $ unpack pagesRaw
-  if null titleStr
+  if null title
     then Nothing
     else
       Just
         Book
-          { title = titleStr,
+          { title = title,
             pages = pages
           }
